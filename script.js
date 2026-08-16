@@ -1,16 +1,30 @@
 // Language switching
 function setLang(lang) {
+  if (lang !== "uk" && lang !== "en") return;
+
   document.body.classList.toggle("lang-en", lang === "en");
   document.getElementById("lang-uk").classList.toggle("active", lang === "uk");
   document.getElementById("lang-en").classList.toggle("active", lang === "en");
   document.documentElement.lang = lang;
   localStorage.setItem("preferredLang", lang);
+
+  const url = new URL(window.location.href);
+  if (lang === "en") {
+    url.searchParams.set("lang", "en");
+  } else {
+    url.searchParams.delete("lang");
+  }
+  history.replaceState(null, "", url);
 }
 
-// Load saved language preference
+// Prefer ?lang=en|uk from the URL, then localStorage; default stays Ukrainian
+const urlLang = new URLSearchParams(window.location.search).get("lang");
 const savedLang = localStorage.getItem("preferredLang");
-if (savedLang) {
-  setLang(savedLang);
+const initialLang =
+  urlLang === "en" || urlLang === "uk" ? urlLang : savedLang;
+
+if (initialLang === "en" || initialLang === "uk") {
+  setLang(initialLang);
 }
 
 // Mobile sidebar toggle
